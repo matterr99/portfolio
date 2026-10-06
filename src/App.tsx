@@ -26,7 +26,7 @@ export default function App() {
       subtitle: 'Player Development & Biomechanics Insights',
       description:
         'Player development methodologies, kinetic chain efficiency diagnostics, and modern tennis training insights.',
-      url: 'https://matterr99.github.io/Tennis-portfolio/index.html',
+      url: 'https://matterr99.github.io/tennis-portfolio/',
       image: tennisImg,
       actionText: 'Open Tennis Portfolio',
     },

@@ -81,7 +81,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] bg-[#070a12] text-slate-100 font-editorial-sans selection:bg-amber-400 selection:text-slate-950 flex flex-col justify-between overflow-x-hidden">
+    <div className="relative min-h-[100dvh] bg-[#070a12] text-slate-100 font-editorial-sans selection:bg-amber-400 selection:text-slate-950 flex flex-col justify-between overflow-x-clip">
       {/* Top Architectural Progress Sweep on Initial Load */}
       {!prefersReducedMotion && (
         <motion.div
@@ -94,7 +94,7 @@ export default function App() {
         />
       )}
 
-      {/* Subtle Ambient Background Lighting & Architectural Grid */}
+      {/* Subtle Ambient Background Lighting & Architectural Grid (Zero-Blur Radial Gradients for 60fps Mobile Scroll) */}
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -102,10 +102,15 @@ export default function App() {
         className="pointer-events-none fixed inset-0 overflow-hidden"
         aria-hidden="true"
       >
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-amber-500/[0.06] blur-[120px]" />
-        <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[130px]" />
         <div
-          className="absolute inset-0 opacity-[0.18]"
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(650px 320px at 50% -4%, rgba(245, 158, 11, 0.08), transparent 72%), radial-gradient(460px 460px at 95% 38%, rgba(6, 182, 212, 0.05), transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.16]"
           style={{
             backgroundImage:
               'radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px)',
@@ -230,18 +235,14 @@ export default function App() {
         <section aria-label="Featured Projects">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
             {PROJECTS.map((project, idx) => {
-              const cardDelay = idx * 0.2;
+              const cardDelay = idx * 0.14;
               return (
                 <motion.article
                   key={project.id}
-                  initial={
-                    prefersReducedMotion
-                      ? false
-                      : { opacity: 0, y: 32, clipPath: 'inset(0 0 18% 0)' }
-                  }
-                  whileInView={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
-                  viewport={{ once: true, amount: 0.16 }}
-                  transition={{ duration: 0.95, delay: cardDelay, ease: BUILD_EASE }}
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 'some' }}
+                  transition={{ duration: 0.9, delay: cardDelay, ease: BUILD_EASE }}
                   className={`group relative rounded-none overflow-hidden bg-gradient-to-b from-[#111829]/90 to-[#0c111e]/95 border border-white/[0.09] transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_-16px_rgba(0,0,0,0.75)] hover:-translate-y-1 hover:shadow-2xl ${project.accentGlow}`}
                   style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
                 >
@@ -249,8 +250,8 @@ export default function App() {
                   <motion.div
                     initial={prefersReducedMotion ? false : { scaleX: 0 }}
                     whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true, amount: 0.16 }}
-                    transition={{ duration: 0.9, delay: cardDelay + 0.2, ease: BUILD_EASE }}
+                    viewport={{ once: true, amount: 'some' }}
+                    transition={{ duration: 0.9, delay: cardDelay + 0.15, ease: BUILD_EASE }}
                     style={{ transformOrigin: 'left' }}
                     className={`h-[2px] w-full bg-white/[0.1] transition-colors duration-300 ${project.topBar}`}
                   />
@@ -265,10 +266,10 @@ export default function App() {
                       aria-label={`Open ${project.title}`}
                     >
                       <motion.img
-                        initial={prefersReducedMotion ? false : { scale: 1.09, opacity: 0.35 }}
+                        initial={prefersReducedMotion ? false : { scale: 1.06, opacity: 0.4 }}
                         whileInView={{ scale: 1, opacity: 0.9 }}
-                        viewport={{ once: true, amount: 0.16 }}
-                        transition={{ duration: 1.2, delay: cardDelay + 0.15, ease: BUILD_EASE }}
+                        viewport={{ once: true, amount: 'some' }}
+                        transition={{ duration: 1.15, delay: cardDelay + 0.1, ease: BUILD_EASE }}
                         src={project.image}
                         alt={project.title}
                         loading={idx === 0 ? 'eager' : 'lazy'}
@@ -355,10 +356,10 @@ export default function App() {
 
         {/* Connect Banner — Constructs on scroll */}
         <motion.section
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 30, clipPath: 'inset(0 0 14% 0)' }}
-          whileInView={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
-          viewport={{ once: true, amount: 0.22 }}
-          transition={{ duration: 1.0, ease: BUILD_EASE }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 'some' }}
+          transition={{ duration: 0.95, ease: BUILD_EASE }}
           className="relative overflow-hidden p-8 sm:p-12 rounded-none border border-white/[0.09] bg-gradient-to-br from-[#121a2e]/90 via-[#0d1322]/95 to-[#0a0f1c] text-center space-y-4 shadow-2xl"
           style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
         >
@@ -366,14 +367,18 @@ export default function App() {
           <motion.div
             initial={prefersReducedMotion ? false : { scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, amount: 0.22 }}
-            transition={{ duration: 1.1, delay: 0.2, ease: BUILD_EASE }}
+            viewport={{ once: true, amount: 'some' }}
+            transition={{ duration: 1.05, delay: 0.15, ease: BUILD_EASE }}
             style={{ transformOrigin: 'left' }}
             className="absolute top-0 left-0 right-0 h-[2px] bg-amber-400/70"
             aria-hidden="true"
           />
           <div
-            className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[180px] rounded-full bg-amber-400/[0.09] blur-[80px]"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(380px 180px at 50% 0%, rgba(251, 191, 36, 0.1), transparent 72%)',
+            }}
             aria-hidden="true"
           />
 

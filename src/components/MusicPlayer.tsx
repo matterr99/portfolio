@@ -194,21 +194,21 @@ export const MusicPlayer: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#04060c]/82 backdrop-blur-md"
+            exit={{ opacity: 0, pointerEvents: 'none', transition: { duration: 0.18 } }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#04060c]/85 sm:backdrop-blur-md"
             role="dialog"
             aria-modal="true"
             aria-label="Audio experience prompt"
             onClick={() => setShowWelcomePrompt(false)}
           >
             <motion.div
-              initial={{ opacity: 0, y: 26, clipPath: 'inset(0 0 18% 0)' }}
-              animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
-              exit={{ opacity: 0, y: 14, scale: 0.98 }}
-              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 24, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.985, transition: { duration: 0.16 } }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md rounded-none border border-white/[0.12] bg-[#0b101d]/95 shadow-[0_24px_70px_-16px_rgba(0,0,0,0.9)] overflow-hidden"
+              className="relative w-full max-w-md rounded-none border border-white/[0.12] bg-[#0b101d]/98 shadow-[0_24px_70px_-16px_rgba(0,0,0,0.9)] overflow-hidden"
               style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
             >
               {/* Animated Top Amber Construction Bar */}

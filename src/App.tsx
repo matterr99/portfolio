@@ -1,13 +1,77 @@
 import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Mail, Github, Check, Copy } from 'lucide-react';
+import { MusicPlayer } from './components/MusicPlayer';
 
-// Direct imports using lowercase images folder
-import tennisImg from '../public/images/IMG_1374.jpeg';
-import kairosImg from '../public/images/bloomberg_lead_macro_1790446169392.jpg';
+import tennisImg from './assets/images/tennis_court_hero.jpg';
+import kairosImg from './assets/images/bloomberg_lead_macro_1790446169392.jpg';
 import webdevImg from '../public/images/IMG_1388.jpeg';
+
+const PROJECTS = [
+  {
+    id: 'tennis',
+    index: '01',
+    tag: 'Athletic Science',
+    status: 'Live Module',
+    dotColor: 'bg-emerald-400',
+    topBar: 'group-hover:bg-emerald-400',
+    statusText: 'text-emerald-300 border-emerald-400/25 bg-emerald-950/75',
+    accentGlow: 'hover:border-emerald-400/35 hover:shadow-emerald-500/10',
+    titleHover: 'group-hover:text-emerald-300',
+    title: 'Tennis Portfolio',
+    subtitle: 'Player Development & Biomechanics',
+    description:
+      'Player development methodologies, kinetic chain efficiency diagnostics, and modern tennis training insights.',
+    highlights: ['Biomechanics', 'Kinetic Chain', 'Match Analytics'],
+    url: 'https://matterr99.github.io/tennis-portfolio/',
+    image: tennisImg,
+    actionText: 'Open Tennis Portfolio',
+  },
+  {
+    id: 'kairos',
+    index: '02',
+    tag: 'Macro Intelligence',
+    status: 'In Progress',
+    dotColor: 'bg-amber-400',
+    topBar: 'group-hover:bg-amber-400',
+    statusText: 'text-amber-300 border-amber-400/25 bg-amber-950/75',
+    accentGlow: 'hover:border-amber-400/35 hover:shadow-amber-500/10',
+    titleHover: 'group-hover:text-amber-300',
+    title: 'Kairos Global Research',
+    subtitle: 'Cross-Asset Macro Terminal',
+    description:
+      'Cross-asset macro research terminal tracking global liquidity conditions, sovereign yield curves, and central bank balance sheets.',
+    highlights: ['Global Liquidity', 'Yield Curves', 'FX Regimes'],
+    url: 'https://matterr99.github.io/kairos-macro-trading-hub/',
+    image: kairosImg,
+    actionText: 'Access Kairos Terminal',
+  },
+  {
+    id: 'webdev',
+    index: '03',
+    tag: 'Web Engineering',
+    status: 'Active Repos',
+    dotColor: 'bg-cyan-400',
+    topBar: 'group-hover:bg-cyan-400',
+    statusText: 'text-cyan-300 border-cyan-400/25 bg-cyan-950/75',
+    accentGlow: 'hover:border-cyan-400/35 hover:shadow-cyan-500/10',
+    titleHover: 'group-hover:text-cyan-300',
+    title: 'Web Development',
+    subtitle: 'UI/UX & Systems Architecture',
+    description:
+      'Showcase of clean UI/UX architectures, performant reactive state paradigms, custom scripts, and modern web applications.',
+    highlights: ['React & TypeScript', 'Design Systems', 'Performance'],
+    url: 'https://github.com/matterr99',
+    image: webdevImg,
+    actionText: 'Explore Repositories',
+  },
+] as const;
+
+const BUILD_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function App() {
   const [copied, setCopied] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -16,68 +80,65 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const projects = [
-    {
-      id: 'tennis',
-      tag: 'Athletic Science',
-      status: 'Live Module',
-      statusColor: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
-      title: 'Tennis Portfolio',
-      subtitle: 'Player Development & Biomechanics Insights',
-      description:
-        'Player development methodologies, kinetic chain efficiency diagnostics, and modern tennis training insights.',
-      url: 'https://matterr99.github.io/tennis-portfolio/',
-      image: tennisImg,
-      actionText: 'Open Tennis Portfolio',
-    },
-    {
-      id: 'kairos',
-      tag: 'Macro Intelligence',
-      status: 'In Progress',
-      statusColor: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
-      title: 'Kairos Global Research',
-      subtitle: 'Cross-Asset Macro Research Terminal',
-      description:
-        'Cross-asset macro research terminal tracking global liquidity conditions, sovereign yield curves, and central bank balance sheets.',
-      url: 'https://matterr99.github.io/kairos-macro-trading-hub/',
-      image: kairosImg,
-      actionText: 'Access Kairos Terminal',
-    },
-    {
-      id: 'webdev',
-      tag: 'Web Engineering',
-      status: 'Active Repos',
-      statusColor: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10',
-      title: 'Web Development',
-      subtitle: 'Clean UI/UX & Systems Architecture',
-      description:
-        'Showcase of clean UI/UX architectures, performant reactive state paradigms, custom scripts, and modern web applications.',
-      url: 'https://github.com/matterr99',
-      image: webdevImg,
-      actionText: 'Explore Repositories',
-    },
-  ];
-
   return (
-    <div className="min-h-[100dvh] bg-[#0b0f19] text-slate-100 font-sans selection:bg-amber-400 selection:text-black flex flex-col justify-between overflow-x-hidden">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-[#0e1422]/95 backdrop-blur-md border-b border-slate-800/80 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
+    <div className="relative min-h-[100dvh] bg-[#070a12] text-slate-100 font-editorial-sans selection:bg-amber-400 selection:text-slate-950 flex flex-col justify-between overflow-x-hidden">
+      {/* Top Architectural Progress Sweep on Initial Load */}
+      {!prefersReducedMotion && (
+        <motion.div
+          initial={{ scaleX: 0, opacity: 1 }}
+          animate={{ scaleX: 1, opacity: [1, 1, 0] }}
+          transition={{ duration: 1.85, times: [0, 0.8, 1], ease: BUILD_EASE }}
+          style={{ transformOrigin: 'left' }}
+          className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 z-50 pointer-events-none"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Subtle Ambient Background Lighting & Architectural Grid */}
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: 'easeOut' }}
+        className="pointer-events-none fixed inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-amber-500/[0.06] blur-[120px]" />
+        <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[130px]" />
+        <div
+          className="absolute inset-0 opacity-[0.18]"
+          style={{
+            backgroundImage:
+              'radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 72%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 72%)',
+          }}
+        />
+      </motion.div>
+
+      {/* Header — Builds in first */}
+      <motion.header
+        initial={prefersReducedMotion ? false : { opacity: 0, y: -14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.1, ease: BUILD_EASE }}
+        className="sticky top-0 z-30 bg-[#070a12]/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]"
+      >
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
           <a
             href="#"
-            className="text-base sm:text-xl font-black tracking-tighter uppercase font-sans text-white hover:text-amber-400 active:text-amber-300 transition-colors shrink-0 flex items-center gap-1"
+            className="group text-base sm:text-lg font-extrabold tracking-tight uppercase text-white hover:text-amber-300 transition-colors shrink-0 flex items-center gap-1"
           >
-            <span>GABRIEL VASQUEZ</span>
-            <span className="text-amber-400">.</span>
+            <span>Gabriel Vasquez</span>
+            <span className="text-amber-400 group-hover:scale-125 transition-transform inline-block">.</span>
           </a>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <a
               href="mailto:matterr99@outlook.com"
-              className="min-h-[42px] px-3 sm:px-3.5 py-2 text-xs font-bold font-mono text-slate-300 hover:text-amber-400 active:bg-slate-700/80 active:scale-[0.98] flex items-center gap-1.5 transition-all rounded-xl bg-slate-800/90 border border-slate-700/70 shadow-xs touch-manipulation"
+              className="h-10 px-3.5 text-xs font-medium font-editorial-mono text-slate-300 hover:text-white flex items-center gap-2 transition-all rounded-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-amber-400/50 touch-manipulation"
               aria-label="Send Email to Gabriel Vasquez"
             >
-              <Mail className="w-4 h-4 text-amber-400 shrink-0" />
+              <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden md:inline">matterr99@outlook.com</span>
               <span className="md:hidden">Email</span>
             </a>
@@ -86,7 +147,7 @@ export default function App() {
               href="https://github.com/matterr99"
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[42px] min-w-[42px] flex items-center justify-center p-2 rounded-xl border border-slate-700/80 bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 active:scale-[0.96] text-slate-300 hover:text-white transition-all shadow-xs touch-manipulation"
+              className="h-10 w-10 flex items-center justify-center rounded-none border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.09] hover:border-white/25 text-slate-300 hover:text-white transition-all touch-manipulation"
               title="GitHub Profile"
               aria-label="GitHub Profile"
             >
@@ -94,153 +155,288 @@ export default function App() {
             </a>
           </div>
         </div>
-      </header>
+        {/* Animated Header Bottom Rule */}
+        <motion.div
+          initial={prefersReducedMotion ? false : { scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1.05, delay: 0.25, ease: BUILD_EASE }}
+          style={{ transformOrigin: 'left' }}
+          className="h-px w-full bg-white/[0.08]"
+        />
+      </motion.header>
 
       {/* Main Content */}
-      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-10 md:py-12 space-y-6 sm:space-y-10 flex-1">
-        <div className="border-b border-slate-800/90 pb-5 sm:pb-8 space-y-2 text-left">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-widest text-amber-400">
-              SELECTED WORKS & RESEARCH
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase leading-[1.15]">
-            Projects & Repositories
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl leading-relaxed">
-            Specialized projects, macro intelligence environments, athletic training methodologies, and core development repositories.
-          </p>
-        </div>
-
-        {/* Project Grid */}
-        <section className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {projects.map((project) => (
-              <article
-                key={project.id}
-                className="group border border-slate-800/90 rounded-2xl overflow-hidden bg-[#131b2e]/90 hover:border-slate-700 active:border-slate-600 transition-all duration-300 flex flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/5"
+      <main className="relative z-10 max-w-6xl w-full mx-auto px-5 sm:px-8 py-10 sm:py-16 space-y-12 sm:space-y-16 flex-1">
+        {/* Hero Header — Masked typographic construction */}
+        <section className="pb-8 sm:pb-10 relative">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3.5 max-w-2xl">
+              <motion.div
+                initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: BUILD_EASE }}
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-amber-400/[0.07] border border-amber-400/20 border-l-2 border-l-amber-400"
               >
-                <div>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block aspect-16/9 overflow-hidden bg-slate-950 relative cursor-pointer touch-manipulation"
-                    aria-label={`Open ${project.title}`}
-                  >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 active:scale-100 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#131b2e] via-transparent to-transparent pointer-events-none" />
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-[11px] font-editorial-mono font-semibold uppercase tracking-[0.16em] text-amber-300">
+                  Selected Works &amp; Research
+                </span>
+              </motion.div>
 
-                    <div className="absolute top-3 left-3">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/85 text-white backdrop-blur-xs border border-white/10 shadow-sm">
-                        {project.tag}
-                      </span>
+              <div className="overflow-hidden">
+                <motion.h1
+                  initial={prefersReducedMotion ? false : { y: '100%', opacity: 0 }}
+                  animate={{ y: '0%', opacity: 1 }}
+                  transition={{ duration: 0.95, delay: 0.45, ease: BUILD_EASE }}
+                  className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.08] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
+                >
+                  Projects &amp; Repositories
+                </motion.h1>
+              </div>
+
+              <motion.p
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.85, delay: 0.65, ease: BUILD_EASE }}
+                className="text-sm sm:text-base text-slate-400 leading-relaxed"
+              >
+                Specialized projects across macro intelligence environments, athletic training methodologies, and modern web engineering.
+              </motion.p>
+            </div>
+
+            <motion.div
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.78, ease: BUILD_EASE }}
+              className="flex items-center gap-4 text-[11px] font-editorial-mono text-slate-500 uppercase tracking-wider shrink-0"
+            >
+              <span>03 Core Disciplines</span>
+              <span className="text-slate-700" aria-hidden="true">/</span>
+              <span className="text-slate-400">2026 Edition</span>
+            </motion.div>
+          </div>
+
+          {/* Hero Bottom Divider Sweeps Across */}
+          <motion.div
+            initial={prefersReducedMotion ? false : { scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.15, delay: 0.65, ease: BUILD_EASE }}
+            style={{ transformOrigin: 'left' }}
+            className="absolute bottom-0 left-0 right-0 h-px bg-white/[0.09]"
+          />
+        </section>
+
+        {/* Project Grid — Cards unfold & assemble as you scroll */}
+        <section aria-label="Featured Projects">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
+            {PROJECTS.map((project, idx) => {
+              const cardDelay = idx * 0.2;
+              return (
+                <motion.article
+                  key={project.id}
+                  initial={
+                    prefersReducedMotion
+                      ? false
+                      : { opacity: 0, y: 32, clipPath: 'inset(0 0 18% 0)' }
+                  }
+                  whileInView={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
+                  viewport={{ once: true, amount: 0.16 }}
+                  transition={{ duration: 0.95, delay: cardDelay, ease: BUILD_EASE }}
+                  className={`group relative rounded-none overflow-hidden bg-gradient-to-b from-[#111829]/90 to-[#0c111e]/95 border border-white/[0.09] transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_-16px_rgba(0,0,0,0.75)] hover:-translate-y-1 hover:shadow-2xl ${project.accentGlow}`}
+                  style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
+                >
+                  {/* Top Bar Sweeps Left-to-Right on Scroll */}
+                  <motion.div
+                    initial={prefersReducedMotion ? false : { scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, amount: 0.16 }}
+                    transition={{ duration: 0.9, delay: cardDelay + 0.2, ease: BUILD_EASE }}
+                    style={{ transformOrigin: 'left' }}
+                    className={`h-[2px] w-full bg-white/[0.1] transition-colors duration-300 ${project.topBar}`}
+                  />
+
+                  <div>
+                    {/* Card Visual */}
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block aspect-16/10 overflow-hidden bg-slate-950 relative cursor-pointer touch-manipulation"
+                      aria-label={`Open ${project.title}`}
+                    >
+                      <motion.img
+                        initial={prefersReducedMotion ? false : { scale: 1.09, opacity: 0.35 }}
+                        whileInView={{ scale: 1, opacity: 0.9 }}
+                        viewport={{ once: true, amount: 0.16 }}
+                        transition={{ duration: 1.2, delay: cardDelay + 0.15, ease: BUILD_EASE }}
+                        src={project.image}
+                        alt={project.title}
+                        loading={idx === 0 ? 'eager' : 'lazy'}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out group-hover:opacity-100"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f1626] via-[#0f1626]/20 to-transparent pointer-events-none" />
+
+                      {/* Top Floating Tag */}
+                      <div className="absolute top-3.5 left-3.5 flex items-center gap-2">
+                        <span className="text-[10px] font-editorial-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none bg-[#070a12]/85 text-slate-100 backdrop-blur-md border border-white/15">
+                          {project.tag}
+                        </span>
+                      </div>
+
+                      {/* Bottom Floating Status */}
+                      <div className="absolute bottom-3 right-3.5">
+                        <span
+                          className={`inline-flex items-center gap-1.5 text-[10px] font-editorial-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none border backdrop-blur-md ${project.statusText}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${project.dotColor}`} />
+                          {project.status}
+                        </span>
+                      </div>
+                    </a>
+
+                    {/* Card Body */}
+                    <div className="p-6 space-y-3 text-left">
+                      <div className="space-y-1">
+                        <p className="text-[11px] font-medium text-slate-400 uppercase tracking-[0.12em] font-editorial-mono">
+                          {project.subtitle}
+                        </p>
+                        <h2
+                          className={`text-xl font-bold tracking-tight text-white transition-colors leading-snug ${project.titleHover}`}
+                        >
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="touch-manipulation"
+                          >
+                            {project.title}
+                          </a>
+                        </h2>
+                      </div>
+
+                      <p className="text-sm text-slate-400 leading-relaxed">
+                        {project.description}
+                      </p>
+
+                      {/* Subtle Unboxed Highlights */}
+                      <div className="pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-editorial-mono text-slate-500">
+                        {project.highlights.map((item, i) => (
+                          <React.Fragment key={item}>
+                            <span>{item}</span>
+                            {i < project.highlights.length - 1 && (
+                              <span className="text-slate-700" aria-hidden="true">·</span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
-
-                    <div className="absolute bottom-2.5 right-3">
-                      <span
-                        className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border backdrop-blur-xs ${project.statusColor}`}
-                      >
-                        {project.status}
-                      </span>
-                    </div>
-                  </a>
-
-                  <div className="p-4 sm:p-6 space-y-2 sm:space-y-3 text-left">
-                    <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors leading-snug">
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="touch-manipulation"
-                      >
-                        {project.title}
-                      </a>
-                    </h2>
-                    <p className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
-                      {project.subtitle}
-                    </p>
-                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                      {project.description}
-                    </p>
                   </div>
-                </div>
 
-                <div className="p-4 sm:p-6 pt-0 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-3 sm:mt-4">
-                  <span className="text-[11px] font-mono text-slate-500 font-semibold hidden sm:inline">
-                    2026 EDITION
-                  </span>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full sm:w-auto min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-amber-400 active:bg-amber-300 active:scale-[0.98] text-white hover:text-black active:text-black border border-slate-700 hover:border-amber-400 text-xs font-bold font-sans uppercase tracking-wider transition-all shadow-md touch-manipulation"
-                  >
-                    <span>{project.actionText}</span>
-                    <ArrowUpRight className="w-4 h-4 shrink-0" />
-                  </a>
-                </div>
-              </article>
-            ))}
+                  {/* Card Footer CTA */}
+                  <div className="px-6 pb-6 pt-4 border-t border-white/[0.06] flex items-center justify-between gap-3">
+                    <span className="text-[11px] font-editorial-mono text-slate-600 font-semibold">
+                      {project.index} / 2026
+                    </span>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-2 px-4 rounded-none bg-white/[0.05] hover:bg-amber-400 text-slate-100 hover:text-slate-950 border border-white/[0.12] hover:border-amber-400 text-xs font-bold uppercase tracking-wider transition-all duration-200 touch-manipulation group/btn"
+                    >
+                      <span>{project.actionText}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                    </a>
+                  </div>
+                </motion.article>
+              );
+            })}
           </div>
         </section>
 
-        {/* Connect Banner */}
-        <section className="p-5 sm:p-8 md:p-10 rounded-2xl border border-slate-800 bg-[#131b2e]/60 text-center space-y-3 shadow-md">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-amber-400 block">
-            CONNECT & INQUIRE
-          </span>
-          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
-            Gabriel Vasquez
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed px-2">
-            Available for quantitative macro research, athletic coaching, and web development consultations.
-          </p>
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5 max-w-md mx-auto">
-            <a
-              href="mailto:matterr99@outlook.com"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 active:bg-amber-200 active:scale-[0.98] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-md transition-all font-mono touch-manipulation"
-            >
-              <Mail className="w-4 h-4 shrink-0" />
-              <span>Send Direct Email</span>
-            </a>
+        {/* Connect Banner — Constructs on scroll */}
+        <motion.section
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 30, clipPath: 'inset(0 0 14% 0)' }}
+          whileInView={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
+          viewport={{ once: true, amount: 0.22 }}
+          transition={{ duration: 1.0, ease: BUILD_EASE }}
+          className="relative overflow-hidden p-8 sm:p-12 rounded-none border border-white/[0.09] bg-gradient-to-br from-[#121a2e]/90 via-[#0d1322]/95 to-[#0a0f1c] text-center space-y-4 shadow-2xl"
+          style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
+        >
+          {/* Animated Top Amber Rule on Scroll */}
+          <motion.div
+            initial={prefersReducedMotion ? false : { scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, amount: 0.22 }}
+            transition={{ duration: 1.1, delay: 0.2, ease: BUILD_EASE }}
+            style={{ transformOrigin: 'left' }}
+            className="absolute top-0 left-0 right-0 h-[2px] bg-amber-400/70"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[180px] rounded-full bg-amber-400/[0.09] blur-[80px]"
+            aria-hidden="true"
+          />
 
-            <button
-              onClick={handleCopyEmail}
-              type="button"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 active:scale-[0.98] text-slate-300 hover:text-white border border-slate-700 font-mono text-xs font-semibold transition-all touch-manipulation cursor-pointer"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span className="text-emerald-400">Copied to Clipboard!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>Copy Address</span>
-                </>
-              )}
-            </button>
+          <div className="relative space-y-3">
+            <span className="text-[11px] font-editorial-mono font-semibold uppercase tracking-[0.2em] text-amber-400 block">
+              Connect &amp; Inquire
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              Gabriel Vasquez
+            </h2>
+            <p className="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+              Available for quantitative macro research, athletic coaching, and web development consultations.
+            </p>
+
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+              <a
+                href="mailto:matterr99@outlook.com"
+                className="w-full sm:w-auto h-12 inline-flex items-center justify-center gap-2 px-6 rounded-none bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/15 transition-all font-editorial-mono touch-manipulation"
+              >
+                <Mail className="w-4 h-4 shrink-0" />
+                <span>Send Direct Email</span>
+              </a>
+
+              <button
+                onClick={handleCopyEmail}
+                type="button"
+                className="w-full sm:w-auto h-12 inline-flex items-center justify-center gap-2 px-5 rounded-none bg-white/[0.05] hover:bg-white/[0.09] active:scale-[0.98] text-slate-200 hover:text-white border border-white/[0.12] font-editorial-mono text-xs font-medium transition-all touch-manipulation cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="text-emerald-400">Copied to Clipboard</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>Copy Address</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-        </section>
+        </motion.section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#080c14] py-5 sm:py-7 px-4 sm:px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-mono text-slate-500 text-center sm:text-left">
-          <div className="font-bold text-slate-300 uppercase tracking-wider">
-            GABRIEL VASQUEZ · SELECTED WORKS
+      {/* Footer — Reveals on scroll, extra bottom padding on mobile so MusicPlayer never overlaps */}
+      <motion.footer
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.85, ease: BUILD_EASE }}
+        className="relative z-10 border-t border-white/[0.07] bg-[#05080f]/90 py-6 pb-24 sm:pb-6 px-5 sm:px-8"
+      >
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-editorial-mono text-slate-500 text-center sm:text-left">
+          <div className="font-semibold text-slate-300 uppercase tracking-wider">
+            Gabriel Vasquez · Selected Works
           </div>
           <div>&copy; 2026 Gabriel Vasquez. All Rights Reserved.</div>
         </div>
-      </footer>
+      </motion.footer>
+
+      {/* Floating 3-Track Ambient Music Player */}
+      <MusicPlayer />
     </div>
   );
 }

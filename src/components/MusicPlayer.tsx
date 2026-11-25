@@ -1,0 +1,538 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  ChevronUp,
+  ChevronDown,
+  Headphones,
+  Music,
+  X,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+export interface Track {
+  id: string;
+  number: string;
+  title: string;
+  artist: string;
+  src: string;
+}
+
+export const TRACKS: Track[] = [
+  {
+    id: 'caracas-en-el-2000',
+    number: '01',
+    title: 'Caracas en el 2000',
+    artist: 'Elena Rose, Danny Ocean & Jerry Di',
+    src: './audio/caracas-en-el-2000.m4a',
+  },
+  {
+    id: 'dame-un-break',
+    number: '02',
+    title: 'Dame Un Break',
+    artist: 'Rawayana',
+    src: './audio/dame-un-break.m4a',
+  },
+  {
+    id: 'dont-stop-til-you-get-enough',
+    number: '03',
+    title: "Don't Stop 'Til You Get Enough",
+    artist: 'Michael Jackson',
+    src: './audio/dont-stop-til-you-get-enough.m4a',
+  },
+  {
+    id: 'beat-it',
+    number: '04',
+    title: 'Beat It',
+    artist: 'Michael Jackson',
+    src: './audio/beat-it.m4a',
+  },
+  {
+    id: 'bad',
+    number: '05',
+    title: 'Bad',
+    artist: 'Michael Jackson',
+    src: './audio/bad.m4a',
+  },
+  {
+    id: 'everybody-wants-to-rule-the-world',
+    number: '06',
+    title: 'Everybody Wants To Rule The World',
+    artist: 'Tears For Fears',
+    src: './audio/everybody-wants-to-rule-the-world.m4a',
+  },
+  {
+    id: 'white-horse',
+    number: '07',
+    title: 'White Horse',
+    artist: 'Chris Stapleton',
+    src: './audio/white-horse.m4a',
+  },
+  {
+    id: 'se-vienen-cositas',
+    number: '08',
+    title: 'Se Vienen Cositas',
+    artist: 'Featured Track',
+    src: './audio/se-vienen-cositas.m4a',
+  },
+];
+
+function formatTime(sec: number): string {
+  if (!Number.isFinite(sec) || sec <= 0) return '0:00';
+  const s = Math.floor(sec);
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return `${m}:${rem.toString().padStart(2, '0')}`;
+}
+
+export const MusicPlayer: React.FC = () => {
+  const [showWelcomePrompt, setShowWelcomePrompt] = useState(true);
+  const [trackIndex, setTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [volume, setVolume] = useState(0.65);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const track = TRACKS[trackIndex];
+  const effectiveVolume = isMuted ? 0 : volume;
+
+  // Keep audio element volume synced
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = effectiveVolume;
+    }
+  }, [effectiveVolume]);
+
+  // Dismiss welcome prompt on Escape
+  useEffect(() => {
+    if (!showWelcomePrompt) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowWelcomePrompt(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [showWelcomePrompt]);
+
+  const playTrackByIndex = useCallback((index: number) => {
+    const nextTrack = TRACKS[index];
+    setTrackIndex(index);
+    setCurrentTime(0);
+    setDuration(0);
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.src = nextTrack.src;
+    audio.load();
+    audio.volume = effectiveVolume;
+    audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
+  }, [effectiveVolume]);
+
+  const togglePlayPause = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      if (!audio.src) {
+        audio.src = track.src;
+      }
+      audio.volume = effectiveVolume;
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+    }
+  }, [isPlaying, track.src, effectiveVolume]);
+
+  const handlePrev = useCallback(() => {
+    const prevIdx = (trackIndex - 1 + TRACKS.length) % TRACKS.length;
+    playTrackByIndex(prevIdx);
+  }, [trackIndex, playTrackByIndex]);
+
+  const handleNext = useCallback(() => {
+    const nextIdx = (trackIndex + 1) % TRACKS.length;
+    playTrackByIndex(nextIdx);
+  }, [trackIndex, playTrackByIndex]);
+
+  const handleStartFromPrompt = (index = 0) => {
+    setShowWelcomePrompt(false);
+    setIsExpanded(false);
+    playTrackByIndex(index);
+  };
+
+  const progressPct = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+  return (
+    <>
+      {/* Hidden Native HTML5 Audio Engine */}
+      <audio
+        ref={audioRef}
+        preload="none"
+        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onEnded={handleNext}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      />
+
+      {/* Initial Entry Music Prompt Modal — Animated architectural build */}
+      <AnimatePresence>
+        {showWelcomePrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#04060c]/82 backdrop-blur-md"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Audio experience prompt"
+            onClick={() => setShowWelcomePrompt(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 26, clipPath: 'inset(0 0 18% 0)' }}
+              animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
+              exit={{ opacity: 0, y: 14, scale: 0.98 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md rounded-none border border-white/[0.12] bg-[#0b101d]/95 shadow-[0_24px_70px_-16px_rgba(0,0,0,0.9)] overflow-hidden"
+              style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
+            >
+              {/* Animated Top Amber Construction Bar */}
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.95, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformOrigin: 'left' }}
+                className="h-[2px] w-full bg-amber-400"
+              />
+
+              {/* Prompt Header */}
+              <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-white/[0.07]">
+                <div className="space-y-2">
+                  <motion.div
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.65, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-flex items-center gap-2 text-[10px] font-editorial-mono font-semibold uppercase tracking-[0.18em] text-amber-400"
+                  >
+                    <Headphones className="w-3.5 h-3.5" />
+                    <span>Audio Experience · 08 Tracks</span>
+                  </motion.div>
+
+                  <div className="overflow-hidden">
+                    <motion.h2
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: '0%', opacity: 1 }}
+                      transition={{ duration: 0.75, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      className="text-xl font-extrabold tracking-tight text-white leading-snug"
+                    >
+                      I love music — want to listen while you check out my page?
+                    </motion.h2>
+                  </div>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="text-xs text-slate-400 leading-relaxed"
+                  >
+                    I put together a few of my favorite tracks, so I was wondering if you&apos;d like to listen to some while exploring. Pick a song below or hit play — you can control or mute it anytime.
+                  </motion.p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowWelcomePrompt(false)}
+                  aria-label="Close prompt"
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Quick Track Picker inside Prompt — Staggered Reveal */}
+              <div className="max-h-56 overflow-y-auto divide-y divide-white/[0.05] bg-[#080c16]/70">
+                {TRACKS.map((t, idx) => (
+                  <motion.button
+                    key={t.id}
+                    type="button"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.55 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={() => handleStartFromPrompt(idx)}
+                    className="w-full px-6 py-2.5 flex items-center justify-between gap-3 text-left hover:bg-amber-400/[0.08] transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[11px] font-editorial-mono font-bold text-slate-500 group-hover:text-amber-400 transition-colors">
+                        {t.number}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-slate-100 group-hover:text-white truncate">
+                          {t.title}
+                        </div>
+                        <div className="text-[10px] font-editorial-mono text-slate-500 truncate">
+                          {t.artist}
+                        </div>
+                      </div>
+                    </div>
+                    <Play className="w-3 h-3 text-slate-500 group-hover:text-amber-400 shrink-0 fill-current" />
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Prompt Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+                className="p-5 border-t border-white/[0.08] bg-[#0b101d] flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleStartFromPrompt(0)}
+                  className="flex-1 h-11 inline-flex items-center justify-center gap-2 px-5 rounded-none bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs uppercase tracking-wider font-editorial-mono transition-all cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Play Music</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowWelcomePrompt(false)}
+                  className="h-11 inline-flex items-center justify-center px-5 rounded-none bg-white/[0.04] hover:bg-white/[0.09] text-slate-300 hover:text-white border border-white/[0.1] font-editorial-mono text-xs font-medium uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  No Thanks
+                </button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Persistent Floating Squared Music Player Dock */}
+      <motion.aside
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.35, ease: 'easeOut' }}
+        aria-label="Music Player"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-[350px] max-w-[370px]"
+      >
+        <div
+          className="rounded-none border border-white/[0.12] border-t-2 border-t-amber-400 bg-[#0b101d]/95 backdrop-blur-xl shadow-[0_18px_50px_-12px_rgba(0,0,0,0.85)] overflow-hidden"
+          style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
+        >
+          {/* Expandable 6-Track Playlist & Volume Drawer */}
+          <AnimatePresence initial={false}>
+            {isExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="overflow-hidden border-b border-white/[0.08]"
+              >
+                <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between text-[10px] font-editorial-mono uppercase tracking-[0.16em] text-slate-400">
+                  <span className="flex items-center gap-1.5">
+                    <Music className="w-3 h-3 text-amber-400" />
+                    <span>Portfolio Soundtrack</span>
+                  </span>
+                  <span>08 Tracks</span>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto divide-y divide-white/[0.05]">
+                  {TRACKS.map((t, idx) => {
+                    const active = idx === trackIndex;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => playTrackByIndex(idx)}
+                        className={`w-full px-4 py-2.5 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer ${
+                          active
+                            ? 'bg-amber-400/[0.1] text-white'
+                            : 'hover:bg-white/[0.04] text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span
+                            className={`text-[11px] font-editorial-mono font-bold ${
+                              active ? 'text-amber-400' : 'text-slate-500'
+                            }`}
+                          >
+                            {t.number}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold truncate">{t.title}</div>
+                            <div className="text-[10px] font-editorial-mono text-slate-500 truncate">
+                              {t.artist}
+                            </div>
+                          </div>
+                        </div>
+                        {active && isPlaying && (
+                          <span className="text-[9px] font-editorial-mono font-bold uppercase tracking-wider text-amber-400 shrink-0">
+                            Playing
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Volume Control */}
+                <div className="px-4 py-2.5 bg-[#080c16] border-t border-white/[0.06] flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsMuted((m) => !m)}
+                    aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+                    className="text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="w-3.5 h-3.5" />
+                    ) : (
+                      <Volume2 className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.02}
+                    value={isMuted ? 0 : volume}
+                    onChange={(e) => {
+                      setIsMuted(false);
+                      setVolume(Number(e.target.value));
+                    }}
+                    aria-label="Volume"
+                    className="flex-1 h-1 accent-amber-400 cursor-pointer"
+                  />
+                  <span className="text-[10px] font-editorial-mono text-slate-500 tabular-nums w-8 text-right">
+                    {Math.round((isMuted ? 0 : volume) * 100)}%
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Interactive Progress Bar */}
+          <div
+            role="progressbar"
+            aria-valuenow={Math.round(progressPct)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            onClick={(e) => {
+              const audio = audioRef.current;
+              if (!audio || !duration) return;
+              const rect = e.currentTarget.getBoundingClientRect();
+              const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+              audio.currentTime = ratio * duration;
+              setCurrentTime(audio.currentTime);
+            }}
+            className="h-1.5 w-full bg-white/[0.07] cursor-pointer relative group"
+            title="Seek track"
+          >
+            <div
+              className="h-full bg-amber-400 transition-all duration-150"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+
+          {/* Compact Control Bar */}
+          <div className="px-3.5 py-2.5 flex items-center justify-between gap-3">
+            {/* Track Info + Live Equalizer Bars */}
+            <button
+              type="button"
+              onClick={() => setIsExpanded((e) => !e)}
+              className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group"
+            >
+              <div className="w-7 h-7 shrink-0 border border-white/[0.1] bg-white/[0.03] flex items-end justify-center gap-[2px] p-1.5">
+                {[0.55, 1, 0.72].map((scale, i) => (
+                  <span
+                    key={i}
+                    className={`w-[2px] bg-amber-400 transition-all ${
+                      isPlaying ? 'animate-eq-bar' : 'h-1 opacity-45'
+                    }`}
+                    style={
+                      isPlaying
+                        ? {
+                            height: `${Math.round(scale * 14)}px`,
+                            animationDelay: `${i * 0.16}s`,
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                  {track.title}
+                </div>
+                <div className="text-[10px] font-editorial-mono text-slate-400 tabular-nums truncate">
+                  {track.artist} · {formatTime(currentTime)}
+                  {duration > 0 ? ` / ${formatTime(duration)}` : ''}
+                </div>
+              </div>
+            </button>
+
+            {/* Transport Controls */}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Previous track"
+                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+              >
+                <SkipBack className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={togglePlayPause}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+                className="w-8 h-8 flex items-center justify-center bg-amber-400 hover:bg-amber-300 text-slate-950 transition-colors cursor-pointer"
+              >
+                {isPlaying ? (
+                  <Pause className="w-3.5 h-3.5 fill-current" />
+                ) : (
+                  <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Next track"
+                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+              >
+                <SkipForward className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsExpanded((e) => !e)}
+                aria-label={isExpanded ? 'Collapse playlist' : 'Expand playlist'}
+                className="w-7 h-8 flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors cursor-pointer border-l border-white/[0.08] ml-0.5 pl-1"
+              >
+                {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.aside>
+    </>
+  );
+};

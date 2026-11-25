@@ -1,4 +1,7 @@
 import { ProjectDossier, TickerItem, WireDispatch } from '../types';
+import kairosHeroImg from '../assets/images/bloomberg_lead_macro_1790446169392.jpg';
+import tennisHeroImg from '../assets/images/tennis_court_hero.jpg';
+import webArchHeroImg from '../assets/images/bloomberg_web_architecture_1790446190321.jpg';
 
 export const TICKER_DATA: TickerItem[] = [
   { symbol: 'KAIROS.LIQ', label: 'Kairos Macro Liquidity', value: '$3,842.10B', change: '+2.34%', isPositive: true, category: 'macro' },
@@ -22,7 +25,7 @@ export const PROJECTS_DATA: ProjectDossier[] = [
     statusType: 'progress',
     publishDate: 'September 2026',
     readTime: '6 min read',
-    imageUrl: 'src/assets/images/bloomberg_lead_macro_1790446169392.jpg',
+    imageUrl: kairosHeroImg,
     imageCaption: 'The Kairos macro environment integrates multi-asset pricing feeds, central bank balance sheets, and sovereign bond curve metrics into high-density analytical dashboards.',
     liveUrl: 'https://matterr99.github.io/kairos-macro-trading-hub/',
     githubUrl: 'https://github.com/matterr99/kairos-macro-trading-hub',
@@ -56,7 +59,7 @@ export const PROJECTS_DATA: ProjectDossier[] = [
       {
         heading: 'Algorithmic Liquidity & Yield Decomposition',
         paragraphs: [
-          'The core engine normalizes balance sheet expansions across G4 central banks, accounting for Reverse Repo (RRP) drawdowns and Treasury General Account (TGA) fluctuations. This provides an unobstructed view of net net USD liquidity injecting into asset prices.',
+          'The core engine normalizes balance sheet expansions across G4 central banks, accounting for Reverse Repo (RRP) drawdowns and Treasury General Account (TGA) fluctuations. This provides an unobstructed view of net USD liquidity injecting into asset prices.',
           'Users can drill down from high-level global liquidity indices into localized rate differentials, inflation breakevens, and historical monetary regimes.'
         ]
       },
@@ -79,10 +82,10 @@ export const PROJECTS_DATA: ProjectDossier[] = [
     statusType: 'live',
     publishDate: 'August 2026',
     readTime: '4 min read',
-    imageUrl: '/src/assets/images/IMG_5243.jpeg',
+    imageUrl: tennisHeroImg,
     imageCaption: 'Kinematic tracking visualizer highlighting ground reaction force vector transmission through hip-shoulder rotational separation.',
-    liveUrl: 'https://matterr99.github.io/Tennis-portfolio/index.html',
-    githubUrl: 'https://github.com/matterr99/Tennis-portfolio',
+    liveUrl: 'https://matterr99.github.io/tennis-portfolio/',
+    githubUrl: 'https://github.com/matterr99/tennis-portfolio',
     summary: 'A deep-dive digital monograph and coaching repository establishing scientific methodologies for junior and professional player progression, stroke biomechanics, and match tactical intelligence.',
     keyTakeaways: [
       'Comprehensive kinetic chain breakdown isolating leg drive, core torque, shoulder uncoiling, and racket head lag acceleration.',
@@ -129,8 +132,9 @@ export const PROJECTS_DATA: ProjectDossier[] = [
     statusType: 'repo',
     publishDate: 'September 2026',
     readTime: '5 min read',
-    imageUrl: '/src/assets/images/bloomberg_web_architecture_1790446190321.jpg',
+    imageUrl: webArchHeroImg,
     imageCaption: 'High-density client interfaces prioritize sub-30ms interaction feedback, strict tabular data alignment, and minimal layout shift.',
+    githubUrl: 'https://github.com/matterr99',
     summary: 'A curated showcase of full-stack engineering repositories, custom algorithmic calculators, interactive canvases, and production web applications built with modern architectural discipline.',
     keyTakeaways: [
       'Zero-slop interface philosophy: Eliminated candy pill wrappers, low-contrast text, and unnecessary animation latency.',
@@ -237,14 +241,15 @@ export const AUTHOR_PROFILE = {
   location: 'Global / Remote',
   email: 'matterr99@outlook.com',
   bio: 'Specialized in cross-asset macro liquidity modeling, high-performance tennis player development, and modern software architectures. Building high-density tools where data, physical discipline, and engineering converge.',
-  avatarUrl: '/src/assets/images/bloomberg_gabriel_portrait_1790446199679.jpg',
+  avatarUrl: '',
+  initials: 'GV',
   competencies: [
     { label: 'Macro & Quantitative Finance', detail: 'Global Liquidity, Sovereign Debt, FX Regimes, Cross-Asset Strategy' },
     { label: 'Athletic Science & Tennis', detail: 'Kinetic Chain Diagnostics, Periodized Coaching, Tactical Analytics' },
     { label: 'Software Architecture', detail: 'React 19, TypeScript, Tailwind CSS, High-Density UI, Canvas/WebGL' }
   ],
   externalLinks: {
-    tennisLive: 'https://matterr99.github.io/Tennis-portfolio/index.html',
+    tennisLive: 'https://matterr99.github.io/tennis-portfolio/',
     kairosLive: 'https://matterr99.github.io/kairos-macro-trading-hub/',
     github: 'https://github.com/matterr99',
   }

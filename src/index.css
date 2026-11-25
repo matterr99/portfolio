@@ -64,3 +64,25 @@
 .bloomberg-cyan-glow {
   text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes eq-bar {
+  0%, 100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-eq-bar {
+  transform-origin: bottom;
+  animation: eq-bar 0.75s ease-in-out infinite;
+}

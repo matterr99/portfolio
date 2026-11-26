@@ -424,19 +424,33 @@ export default function App() {
         </motion.section>
       </main>
 
-      {/* Footer — Reveals on scroll, extra bottom padding on mobile so MusicPlayer never overlaps */}
+      {/* Footer — Reveals on scroll, extra bottom padding so the fixed MusicPlayer never overlaps */}
       <motion.footer
         initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.85, ease: BUILD_EASE }}
-        className="relative z-10 border-t border-white/[0.07] bg-[#05080f]/90 py-6 pb-24 sm:pb-6 px-5 sm:px-8"
+        className="relative z-10 border-t border-white/[0.07] bg-[#05080f]/90 pt-6 pb-28 sm:pb-24 px-5 sm:px-8"
       >
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-editorial-mono text-slate-500 text-center sm:text-left">
-          <div className="font-semibold text-slate-300 uppercase tracking-wider">
-            Gabriel Vasquez · Selected Works
+        <div className="max-w-6xl mx-auto space-y-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-editorial-mono text-slate-500 text-center sm:text-left">
+            <div className="font-semibold text-slate-300 uppercase tracking-wider">
+              Gabriel Vasquez · Selected Works
+            </div>
+            <div>&copy; 2026 Gabriel Vasquez. All Rights Reserved.</div>
           </div>
-          <div>&copy; 2026 Gabriel Vasquez. All Rights Reserved.</div>
+
+          <div className="pt-3 border-t border-white/[0.06] text-[10px] leading-relaxed font-editorial-mono text-slate-500/90 text-center sm:text-left">
+            <span className="text-slate-400 uppercase tracking-wider font-semibold">Audio Notice:</span>{' '}
+            All music featured in the optional site player belongs exclusively to its respective artists, songwriters, and record labels. Tracks are included strictly for personal, non-commercial listening while browsing—no ownership, monetization, or distribution is claimed or intended. Rights holders may contact{' '}
+            <a
+              href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
+              className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
+            >
+              matterr99@outlook.com
+            </a>{' '}
+            for immediate removal.
+          </div>
         </div>
       </motion.footer>
 

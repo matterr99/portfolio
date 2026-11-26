@@ -318,6 +318,18 @@ export const MusicPlayer: React.FC = () => {
                   No Thanks
                 </button>
               </motion.div>
+
+              {/* Copyright & Non-Commercial Audio Notice */}
+              <div className="px-6 py-3 border-t border-white/[0.06] bg-[#070a12] text-[10px] leading-relaxed font-editorial-mono text-slate-500">
+                All music rights belong to their respective artists &amp; labels. Played strictly for personal, non-commercial enjoyment—no distribution intended. Removal requests:{' '}
+                <a
+                  href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
+                  className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
+                >
+                  matterr99@outlook.com
+                </a>
+                .
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -422,6 +434,18 @@ export const MusicPlayer: React.FC = () => {
                   <span className="text-[10px] font-editorial-mono text-slate-500 tabular-nums w-8 text-right">
                     {Math.round((isMuted ? 0 : volume) * 100)}%
                   </span>
+                </div>
+
+                {/* Audio Attribution & Takedown Notice */}
+                <div className="px-4 py-2 bg-[#060911] border-t border-white/[0.05] text-[9.5px] leading-relaxed font-editorial-mono text-slate-500">
+                  All rights belong to the respective artists &amp; labels. Personal, non-commercial use only—no distribution intended.{' '}
+                  <a
+                    href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
+                    className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
+                  >
+                    Removal request
+                  </a>
+                  .
                 </div>
               </motion.div>
             )}

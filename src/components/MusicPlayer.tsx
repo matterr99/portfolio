@@ -11,8 +11,10 @@ import {
   Headphones,
   Music,
   X,
+  Globe,
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { COPY, Lang } from '../i18n';
 
 export interface Track {
   id: string;
@@ -89,8 +91,14 @@ function formatTime(sec: number): string {
   return `${m}:${rem.toString().padStart(2, '0')}`;
 }
 
-export const MusicPlayer: React.FC = () => {
+interface MusicPlayerProps {
+  lang?: Lang;
+  onToggleLang?: () => void;
+}
+
+export const MusicPlayer: React.FC<MusicPlayerProps> = ({ lang = 'en', onToggleLang }) => {
   const prefersReducedMotion = useReducedMotion();
+  const m = COPY[lang].music;
   const [showWelcomePrompt, setShowWelcomePrompt] = useState(true);
   const [trackIndex, setTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -103,6 +111,7 @@ export const MusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const track = TRACKS[trackIndex];
   const effectiveVolume = isMuted ? 0 : volume;
+  const getArtistLabel = (t: Track) => (t.id === 'se-vienen-cositas' ? m.featuredTrack : t.artist);
 
   // Keep audio element volume synced
   useEffect(() => {
@@ -204,7 +213,7 @@ export const MusicPlayer: React.FC = () => {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-[#04060c]/85 sm:backdrop-blur-md"
             role="dialog"
             aria-modal="true"
-            aria-label="Audio experience prompt"
+            aria-label={m.dialogAria}
             onClick={() => setShowWelcomePrompt(false)}
           >
             <motion.div
@@ -239,7 +248,7 @@ export const MusicPlayer: React.FC = () => {
                     className="inline-flex items-center gap-2 text-[10px] font-editorial-mono font-semibold uppercase tracking-[0.18em] text-amber-400"
                   >
                     <Headphones className="w-3.5 h-3.5" />
-                    <span>Audio Experience · 08 Tracks</span>
+                    <span>{m.badge}</span>
                   </motion.div>
 
                   <div className="overflow-hidden">
@@ -249,7 +258,7 @@ export const MusicPlayer: React.FC = () => {
                       transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, delay: prefersReducedMotion ? 0 : 0.14, ease: [0.22, 1, 0.36, 1] }}
                       className="text-xl font-extrabold tracking-tight text-white leading-snug"
                     >
-                      I love music — want to listen while you check out my page?
+                      {m.heading}
                     </motion.h2>
                   </div>
 
@@ -259,18 +268,31 @@ export const MusicPlayer: React.FC = () => {
                     transition={{ duration: prefersReducedMotion ? 0.01 : 0.45, delay: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
                     className="text-xs text-slate-400 leading-relaxed"
                   >
-                    I put together a few of my favorite tracks, so I was wondering if you&apos;d like to listen to some while exploring. Pick a song below or hit play — you can control or mute it anytime.
+                    {m.description}
                   </motion.p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowWelcomePrompt(false)}
-                  aria-label="Close prompt"
-                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer shrink-0"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {onToggleLang && (
+                    <button
+                      type="button"
+                      onClick={onToggleLang}
+                      aria-label={COPY[lang].header.langToggleAria}
+                      className="h-7 px-2 inline-flex items-center gap-1 text-[10px] font-editorial-mono font-semibold uppercase tracking-wider border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.09] hover:border-amber-400/50 text-slate-300 transition-colors cursor-pointer"
+                    >
+                      <Globe className="w-3 h-3 text-amber-400" />
+                      <span>{lang === 'en' ? 'ES' : 'EN'}</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowWelcomePrompt(false)}
+                    aria-label={m.closeAria}
+                    className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Quick Track Picker inside Prompt — Staggered Reveal */}
@@ -298,7 +320,7 @@ export const MusicPlayer: React.FC = () => {
                           {t.title}
                         </div>
                         <div className="text-[10px] font-editorial-mono text-slate-500 truncate">
-                          {t.artist}
+                          {getArtistLabel(t)}
                         </div>
                       </div>
                     </div>
@@ -320,7 +342,7 @@ export const MusicPlayer: React.FC = () => {
                   className="flex-1 h-11 inline-flex items-center justify-center gap-2 px-5 rounded-none bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs uppercase tracking-wider font-editorial-mono transition-all cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Play Music</span>
+                  <span>{m.playMusic}</span>
                 </button>
 
                 <button
@@ -328,13 +350,13 @@ export const MusicPlayer: React.FC = () => {
                   onClick={() => setShowWelcomePrompt(false)}
                   className="h-11 inline-flex items-center justify-center px-5 rounded-none bg-white/[0.04] hover:bg-white/[0.09] text-slate-300 hover:text-white border border-white/[0.1] font-editorial-mono text-xs font-medium uppercase tracking-wider transition-all cursor-pointer"
                 >
-                  No Thanks
+                  {m.noThanks}
                 </button>
               </motion.div>
 
               {/* Copyright & Non-Commercial Audio Notice */}
               <div className="px-6 py-3 border-t border-white/[0.06] bg-[#070a12] text-[10px] leading-relaxed font-editorial-mono text-slate-500 shrink-0">
-                All music rights belong to their respective artists &amp; labels. Played strictly for personal, non-commercial enjoyment—no distribution intended. Removal requests:{' '}
+                {m.modalNoticePrefix}{' '}
                 <a
                   href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
                   className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
@@ -353,7 +375,7 @@ export const MusicPlayer: React.FC = () => {
         initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: prefersReducedMotion ? 0.01 : 0.45, delay: prefersReducedMotion ? 0 : 0.35, ease: 'easeOut' }}
-        aria-label="Music Player"
+        aria-label={m.playerAria}
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-[350px] max-w-[370px]"
       >
         <div
@@ -373,9 +395,9 @@ export const MusicPlayer: React.FC = () => {
                 <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between text-[10px] font-editorial-mono uppercase tracking-[0.16em] text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <Music className="w-3 h-3 text-amber-400" />
-                    <span>Portfolio Soundtrack</span>
+                    <span>{m.soundtrack}</span>
                   </span>
-                  <span>08 Tracks</span>
+                  <span>{m.trackCount}</span>
                 </div>
 
                 <div className="max-h-60 overflow-y-auto divide-y divide-white/[0.05]">
@@ -403,13 +425,13 @@ export const MusicPlayer: React.FC = () => {
                           <div className="min-w-0">
                             <div className="text-xs font-semibold truncate">{t.title}</div>
                             <div className="text-[10px] font-editorial-mono text-slate-500 truncate">
-                              {t.artist}
+                              {getArtistLabel(t)}
                             </div>
                           </div>
                         </div>
                         {active && isPlaying && (
                           <span className="text-[9px] font-editorial-mono font-bold uppercase tracking-wider text-amber-400 shrink-0">
-                            Playing
+                            {m.playing}
                           </span>
                         )}
                       </button>
@@ -421,8 +443,8 @@ export const MusicPlayer: React.FC = () => {
                 <div className="px-4 py-2.5 bg-[#080c16] border-t border-white/[0.06] flex items-center gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setIsMuted((m) => !m)}
-                    aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+                    onClick={() => setIsMuted((prev) => !prev)}
+                    aria-label={isMuted ? m.unmuteAria : m.muteAria}
                     className="text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
                   >
                     {isMuted || volume === 0 ? (
@@ -441,7 +463,7 @@ export const MusicPlayer: React.FC = () => {
                       setIsMuted(false);
                       setVolume(Number(e.target.value));
                     }}
-                    aria-label="Volume"
+                    aria-label={m.volumeAria}
                     className="flex-1 h-1 accent-amber-400 cursor-pointer"
                   />
                   <span className="text-[10px] font-editorial-mono text-slate-500 tabular-nums w-8 text-right">
@@ -451,12 +473,12 @@ export const MusicPlayer: React.FC = () => {
 
                 {/* Audio Attribution & Takedown Notice */}
                 <div className="px-4 py-2 bg-[#060911] border-t border-white/[0.05] text-[9.5px] leading-relaxed font-editorial-mono text-slate-500">
-                  All rights belong to the respective artists &amp; labels. Personal, non-commercial use only—no distribution intended.{' '}
+                  {m.drawerNoticePrefix}{' '}
                   <a
                     href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
                     className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
                   >
-                    Removal request
+                    {m.removalRequest}
                   </a>
                   .
                 </div>
@@ -479,7 +501,7 @@ export const MusicPlayer: React.FC = () => {
               setCurrentTime(audio.currentTime);
             }}
             className="h-1.5 w-full bg-white/[0.07] cursor-pointer relative group"
-            title="Seek track"
+            title={m.seekTitle}
           >
             <div
               className="h-full bg-amber-400 transition-all duration-150"
@@ -519,7 +541,7 @@ export const MusicPlayer: React.FC = () => {
                   {track.title}
                 </div>
                 <div className="text-[10px] font-editorial-mono text-slate-400 tabular-nums truncate">
-                  {track.artist} · {formatTime(currentTime)}
+                  {getArtistLabel(track)} · {formatTime(currentTime)}
                   {duration > 0 ? ` / ${formatTime(duration)}` : ''}
                 </div>
               </div>
@@ -530,7 +552,7 @@ export const MusicPlayer: React.FC = () => {
               <button
                 type="button"
                 onClick={handlePrev}
-                aria-label="Previous track"
+                aria-label={m.prevAria}
                 className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
               >
                 <SkipBack className="w-3.5 h-3.5" />
@@ -539,7 +561,7 @@ export const MusicPlayer: React.FC = () => {
               <button
                 type="button"
                 onClick={togglePlayPause}
-                aria-label={isPlaying ? 'Pause' : 'Play'}
+                aria-label={isPlaying ? m.pauseAria : m.playAria}
                 className="w-8 h-8 flex items-center justify-center bg-amber-400 hover:bg-amber-300 text-slate-950 transition-colors cursor-pointer"
               >
                 {isPlaying ? (
@@ -552,7 +574,7 @@ export const MusicPlayer: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                aria-label="Next track"
+                aria-label={m.nextAria}
                 className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
               >
                 <SkipForward className="w-3.5 h-3.5" />
@@ -561,7 +583,7 @@ export const MusicPlayer: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsExpanded((e) => !e)}
-                aria-label={isExpanded ? 'Collapse playlist' : 'Expand playlist'}
+                aria-label={isExpanded ? m.collapseAria : m.expandAria}
                 className="w-7 h-8 flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors cursor-pointer border-l border-white/[0.08] ml-0.5 pl-1"
               >
                 {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}

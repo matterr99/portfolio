@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUpRight, Mail, Github, Check, Copy } from 'lucide-react';
+import { ArrowUpRight, Mail, Github, Check, Copy, Globe } from 'lucide-react';
 import { MusicPlayer } from './components/MusicPlayer';
+import { COPY, Lang } from './i18n';
 
 import tennisImg from './assets/images/tennis_court_hero.jpg';
 import kairosImg from './assets/images/bloomberg_lead_macro_1790446169392.jpg';
@@ -11,70 +12,65 @@ const PROJECTS = [
   {
     id: 'tennis',
     index: '01',
-    tag: 'Athletic Science',
-    status: 'Live Module',
     dotColor: 'bg-emerald-400',
     topBar: 'group-hover:bg-emerald-400',
     statusText: 'text-emerald-300 border-emerald-400/25 bg-emerald-950/75',
     accentGlow: 'hover:border-emerald-400/35 hover:shadow-emerald-500/10',
     titleHover: 'group-hover:text-emerald-300',
-    title: 'Tennis Portfolio',
-    subtitle: 'Player Development & Biomechanics',
-    description:
-      'Player development methodologies, kinetic chain efficiency diagnostics, and modern tennis training insights.',
-    highlights: ['Biomechanics', 'Kinetic Chain', 'Match Analytics'],
     url: 'https://matterr99.github.io/tennis-portfolio/',
     image: tennisImg,
-    actionText: 'Open Tennis Portfolio',
   },
   {
     id: 'kairos',
     index: '02',
-    tag: 'Macro Intelligence',
-    status: 'In Progress',
     dotColor: 'bg-amber-400',
     topBar: 'group-hover:bg-amber-400',
     statusText: 'text-amber-300 border-amber-400/25 bg-amber-950/75',
     accentGlow: 'hover:border-amber-400/35 hover:shadow-amber-500/10',
     titleHover: 'group-hover:text-amber-300',
-    title: 'Kairos Global Research',
-    subtitle: 'Cross-Asset Macro Terminal',
-    description:
-      'Cross-asset macro research terminal tracking global liquidity conditions, sovereign yield curves, and central bank balance sheets.',
-    highlights: ['Global Liquidity', 'Yield Curves', 'FX Regimes'],
     url: 'https://matterr99.github.io/kairos-macro-trading-hub/',
     image: kairosImg,
-    actionText: 'Access Kairos Terminal',
   },
   {
     id: 'webdev',
     index: '03',
-    tag: 'Web Engineering',
-    status: 'Active Repos',
     dotColor: 'bg-cyan-400',
     topBar: 'group-hover:bg-cyan-400',
     statusText: 'text-cyan-300 border-cyan-400/25 bg-cyan-950/75',
     accentGlow: 'hover:border-cyan-400/35 hover:shadow-cyan-500/10',
     titleHover: 'group-hover:text-cyan-300',
-    title: 'Web Development',
-    subtitle: 'UI/UX & Systems Architecture',
-    description:
-      'Showcase of clean UI/UX architectures, performant reactive state paradigms, custom scripts, and modern web applications.',
-    highlights: ['React & TypeScript', 'Design Systems', 'Performance'],
     url: 'https://github.com/matterr99',
     image: webdevImg,
-    actionText: 'Explore Repositories',
   },
 ] as const;
 
 const BUILD_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function App() {
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window === 'undefined') return 'en';
+    try {
+      const saved = window.localStorage.getItem('portfolio-lang');
+      return saved === 'es' ? 'es' : 'en';
+    } catch {
+      return 'en';
+    }
+  });
   const [copied, setCopied] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : true
   );
   const prefersReducedMotion = useReducedMotion();
+  const t = COPY[lang];
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    try {
+      window.localStorage.setItem('portfolio-lang', lang);
+    } catch {
+      // Ignore storage errors in restricted/private browsing contexts
+    }
+  }, [lang]);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)');
@@ -82,6 +78,8 @@ export default function App() {
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
   }, []);
+
+  const toggleLang = () => setLang((prev) => (prev === 'en' ? 'es' : 'en'));
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -138,33 +136,47 @@ export default function App() {
         transition={{ duration: 0.8, delay: 0.1, ease: BUILD_EASE }}
         className="sticky top-0 z-30 bg-[#070a12]/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]"
       >
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
           <a
             href="#"
-            className="group text-base sm:text-lg font-extrabold tracking-tight uppercase text-white hover:text-amber-300 transition-colors shrink-0 flex items-center gap-1"
+            className="group text-sm sm:text-lg font-extrabold tracking-tight uppercase text-white hover:text-amber-300 transition-colors shrink-0 flex items-center gap-0.5 sm:gap-1"
           >
             <span>Gabriel Vasquez</span>
             <span className="text-amber-400 group-hover:scale-125 transition-transform inline-block">.</span>
           </a>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={toggleLang}
+              aria-label={t.header.langToggleAria}
+              title={t.header.langToggleAria}
+              className="h-9 sm:h-10 px-2 sm:px-3 text-[11px] font-semibold font-editorial-mono uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 transition-all rounded-none bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.1] hover:border-amber-400/50 text-slate-300 hover:text-white cursor-pointer touch-manipulation"
+            >
+              <Globe className="hidden sm:block w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className={lang === 'en' ? 'text-white' : 'text-slate-500'}>EN</span>
+              <span className="text-slate-600" aria-hidden="true">/</span>
+              <span className={lang === 'es' ? 'text-amber-300' : 'text-slate-500'}>ES</span>
+            </button>
+
             <a
               href="mailto:matterr99@outlook.com"
-              className="h-10 px-3.5 text-xs font-medium font-editorial-mono text-slate-300 hover:text-white flex items-center gap-2 transition-all rounded-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-amber-400/50 touch-manipulation"
-              aria-label="Send Email to Gabriel Vasquez"
+              className="h-9 w-9 sm:w-auto sm:h-10 sm:px-3.5 text-xs font-medium font-editorial-mono text-slate-300 hover:text-white flex items-center justify-center gap-2 transition-all rounded-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-amber-400/50 touch-manipulation"
+              aria-label={t.header.emailAria}
+              title={t.header.emailAria}
             >
               <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden md:inline">matterr99@outlook.com</span>
-              <span className="md:hidden">Email</span>
+              <span className="hidden sm:inline md:hidden">{t.header.emailMobile}</span>
             </a>
 
             <a
               href="https://github.com/matterr99"
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 w-10 flex items-center justify-center rounded-none border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.09] hover:border-white/25 text-slate-300 hover:text-white transition-all touch-manipulation"
-              title="GitHub Profile"
-              aria-label="GitHub Profile"
+              className="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-none border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.09] hover:border-white/25 text-slate-300 hover:text-white transition-all touch-manipulation"
+              title={t.header.githubTitle}
+              aria-label={t.header.githubTitle}
             >
               <Github className="w-4 h-4" />
             </a>
@@ -194,7 +206,7 @@ export default function App() {
               >
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                 <span className="text-[11px] font-editorial-mono font-semibold uppercase tracking-[0.16em] text-amber-300">
-                  Selected Works &amp; Research
+                  {t.hero.badge}
                 </span>
               </motion.div>
 
@@ -205,7 +217,7 @@ export default function App() {
                   transition={{ duration: 0.95, delay: 0.45, ease: BUILD_EASE }}
                   className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.08] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
                 >
-                  Projects &amp; Repositories
+                  {t.hero.title}
                 </motion.h1>
               </div>
 
@@ -215,7 +227,7 @@ export default function App() {
                 transition={{ duration: 0.85, delay: 0.65, ease: BUILD_EASE }}
                 className="text-sm sm:text-base text-slate-400 leading-relaxed"
               >
-                Specialized projects across macro intelligence environments, athletic training methodologies, and modern web engineering.
+                {t.hero.description}
               </motion.p>
             </div>
 
@@ -225,9 +237,9 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.78, ease: BUILD_EASE }}
               className="flex items-center gap-4 text-[11px] font-editorial-mono text-slate-500 uppercase tracking-wider shrink-0"
             >
-              <span>03 Core Disciplines</span>
+              <span>{t.hero.disciplines}</span>
               <span className="text-slate-700" aria-hidden="true">/</span>
-              <span className="text-slate-400">2026 Edition</span>
+              <span className="text-slate-400">{t.hero.edition}</span>
             </motion.div>
           </div>
 
@@ -242,10 +254,11 @@ export default function App() {
         </section>
 
         {/* Project Grid — Cards unfold & assemble as you scroll */}
-        <section aria-label="Featured Projects">
+        <section aria-label={t.projectsSectionAria}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
             {PROJECTS.map((project, idx) => {
               const cardDelay = isDesktop ? idx * 0.14 : 0;
+              const copy = t.projects[project.id];
               return (
                 <motion.article
                   key={project.id}
@@ -273,7 +286,7 @@ export default function App() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block aspect-16/10 overflow-hidden bg-slate-950 relative cursor-pointer touch-manipulation"
-                      aria-label={`Open ${project.title}`}
+                      aria-label={copy.openAria}
                     >
                       <motion.div
                         initial={prefersReducedMotion ? false : { scale: 1.06, opacity: 0.4 }}
@@ -284,7 +297,7 @@ export default function App() {
                       >
                         <img
                           src={project.image}
-                          alt={project.title}
+                          alt={copy.title}
                           loading={idx === 0 ? 'eager' : 'lazy'}
                           className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-[scale,opacity] duration-700 ease-out"
                         />
@@ -294,7 +307,7 @@ export default function App() {
                       {/* Top Floating Tag */}
                       <div className="absolute top-3.5 left-3.5 flex items-center gap-2">
                         <span className="text-[10px] font-editorial-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none bg-[#070a12]/85 text-slate-100 backdrop-blur-md border border-white/15">
-                          {project.tag}
+                          {copy.tag}
                         </span>
                       </div>
 
@@ -304,7 +317,7 @@ export default function App() {
                           className={`inline-flex items-center gap-1.5 text-[10px] font-editorial-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none border backdrop-blur-md ${project.statusText}`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${project.dotColor}`} />
-                          {project.status}
+                          {copy.status}
                         </span>
                       </div>
                     </a>
@@ -313,7 +326,7 @@ export default function App() {
                     <div className="p-6 space-y-3 text-left">
                       <div className="space-y-1">
                         <p className="text-[11px] font-medium text-slate-400 uppercase tracking-[0.12em] font-editorial-mono">
-                          {project.subtitle}
+                          {copy.subtitle}
                         </p>
                         <h2
                           className={`text-xl font-bold tracking-tight text-white transition-colors leading-snug ${project.titleHover}`}
@@ -324,21 +337,21 @@ export default function App() {
                             rel="noopener noreferrer"
                             className="touch-manipulation"
                           >
-                            {project.title}
+                            {copy.title}
                           </a>
                         </h2>
                       </div>
 
                       <p className="text-sm text-slate-400 leading-relaxed">
-                        {project.description}
+                        {copy.description}
                       </p>
 
                       {/* Subtle Unboxed Highlights */}
                       <div className="pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-editorial-mono text-slate-500">
-                        {project.highlights.map((item, i) => (
+                        {copy.highlights.map((item, i) => (
                           <React.Fragment key={item}>
                             <span>{item}</span>
-                            {i < project.highlights.length - 1 && (
+                            {i < copy.highlights.length - 1 && (
                               <span className="text-slate-700" aria-hidden="true">·</span>
                             )}
                           </React.Fragment>
@@ -358,7 +371,7 @@ export default function App() {
                       rel="noopener noreferrer"
                       className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-2 px-4 rounded-none bg-white/[0.05] hover:bg-amber-400 text-slate-100 hover:text-slate-950 border border-white/[0.12] hover:border-amber-400 text-xs font-bold uppercase tracking-wider transition-all duration-200 touch-manipulation group/btn"
                     >
-                      <span>{project.actionText}</span>
+                      <span>{copy.actionText}</span>
                       <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                     </a>
                   </div>
@@ -398,13 +411,13 @@ export default function App() {
 
           <div className="relative space-y-3">
             <span className="text-[11px] font-editorial-mono font-semibold uppercase tracking-[0.2em] text-amber-400 block">
-              Connect &amp; Inquire
+              {t.connect.eyebrow}
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               Gabriel Vasquez
             </h2>
             <p className="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-              Available for quantitative macro research, athletic coaching, and web development consultations.
+              {t.connect.description}
             </p>
 
             <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
@@ -413,7 +426,7 @@ export default function App() {
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center gap-2 px-6 rounded-none bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/15 transition-all font-editorial-mono touch-manipulation"
               >
                 <Mail className="w-4 h-4 shrink-0" />
-                <span>Send Direct Email</span>
+                <span>{t.connect.sendEmail}</span>
               </a>
 
               <button
@@ -424,12 +437,12 @@ export default function App() {
                 {copied ? (
                   <>
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="text-emerald-400">Copied to Clipboard</span>
+                    <span className="text-emerald-400">{t.connect.copied}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>Copy Address</span>
+                    <span>{t.connect.copyAddress}</span>
                   </>
                 )}
               </button>
@@ -449,27 +462,29 @@ export default function App() {
         <div className="max-w-6xl mx-auto space-y-3">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-editorial-mono text-slate-500 text-center sm:text-left">
             <div className="font-semibold text-slate-300 uppercase tracking-wider">
-              Gabriel Vasquez · Selected Works
+              {t.footer.brand}
             </div>
-            <div>&copy; 2026 Gabriel Vasquez. All Rights Reserved.</div>
+            <div>{t.footer.copyright}</div>
           </div>
 
           <div className="pt-3 border-t border-white/[0.06] text-[10px] leading-relaxed font-editorial-mono text-slate-500/90 text-center sm:text-left">
-            <span className="text-slate-400 uppercase tracking-wider font-semibold">Audio Notice:</span>{' '}
-            All music featured in the optional site player belongs exclusively to its respective artists, songwriters, and record labels. Tracks are included strictly for personal, non-commercial listening while browsing—no ownership, monetization, or distribution is claimed or intended. Rights holders may contact{' '}
+            <span className="text-slate-400 uppercase tracking-wider font-semibold">
+              {t.footer.audioNoticeLabel}
+            </span>{' '}
+            {t.footer.audioNoticePrefix}{' '}
             <a
               href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
               className="text-slate-400 hover:text-amber-400 underline underline-offset-2 transition-colors"
             >
               matterr99@outlook.com
             </a>{' '}
-            for immediate removal.
+            {t.footer.audioNoticeSuffix}
           </div>
         </div>
       </motion.footer>
 
-      {/* Floating 3-Track Ambient Music Player */}
-      <MusicPlayer />
+      {/* Floating 8-Track Ambient Music Player */}
+      <MusicPlayer lang={lang} onToggleLang={toggleLang} />
     </div>
   );
 }

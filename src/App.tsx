@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Mail, Github, Check, Copy } from 'lucide-react';
 import { MusicPlayer } from './components/MusicPlayer';
@@ -71,7 +71,17 @@ const BUILD_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function App() {
   const [copied, setCopied] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : true
+  );
   const prefersReducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -235,7 +245,7 @@ export default function App() {
         <section aria-label="Featured Projects">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
             {PROJECTS.map((project, idx) => {
-              const cardDelay = idx * 0.14;
+              const cardDelay = isDesktop ? idx * 0.14 : 0;
               return (
                 <motion.article
                   key={project.id}
@@ -243,7 +253,7 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 'some' }}
                   transition={{ duration: 0.9, delay: cardDelay, ease: BUILD_EASE }}
-                  className={`group relative rounded-none overflow-hidden bg-gradient-to-b from-[#111829]/90 to-[#0c111e]/95 border border-white/[0.09] transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_-16px_rgba(0,0,0,0.75)] hover:-translate-y-1 hover:shadow-2xl ${project.accentGlow}`}
+                  className={`group relative rounded-none overflow-hidden bg-gradient-to-b from-[#111829]/90 to-[#0c111e]/95 border border-white/[0.09] transition-[border-color,box-shadow,translate] duration-300 flex flex-col justify-between shadow-[0_12px_40px_-16px_rgba(0,0,0,0.75)] hover:-translate-y-1 hover:shadow-2xl ${project.accentGlow}`}
                   style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
                 >
                   {/* Top Bar Sweeps Left-to-Right on Scroll */}
@@ -265,16 +275,20 @@ export default function App() {
                       className="block aspect-16/10 overflow-hidden bg-slate-950 relative cursor-pointer touch-manipulation"
                       aria-label={`Open ${project.title}`}
                     >
-                      <motion.img
+                      <motion.div
                         initial={prefersReducedMotion ? false : { scale: 1.06, opacity: 0.4 }}
-                        whileInView={{ scale: 1, opacity: 0.9 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
                         viewport={{ once: true, amount: 'some' }}
                         transition={{ duration: 1.15, delay: cardDelay + 0.1, ease: BUILD_EASE }}
-                        src={project.image}
-                        alt={project.title}
-                        loading={idx === 0 ? 'eager' : 'lazy'}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out group-hover:opacity-100"
-                      />
+                        className="w-full h-full"
+                      >
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          loading={idx === 0 ? 'eager' : 'lazy'}
+                          className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-[scale,opacity] duration-700 ease-out"
+                        />
+                      </motion.div>
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0f1626] via-[#0f1626]/20 to-transparent pointer-events-none" />
 
                       {/* Top Floating Tag */}
@@ -428,7 +442,7 @@ export default function App() {
       <motion.footer
         initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 'some' }}
         transition={{ duration: 0.85, ease: BUILD_EASE }}
         className="relative z-10 border-t border-white/[0.07] bg-[#05080f]/90 pt-6 pb-28 sm:pb-24 px-5 sm:px-8"
       >

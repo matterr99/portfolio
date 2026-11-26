@@ -12,7 +12,7 @@ import {
   Music,
   X,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 export interface Track {
   id: string;
@@ -90,6 +90,7 @@ function formatTime(sec: number): string {
 }
 
 export const MusicPlayer: React.FC = () => {
+  const prefersReducedMotion = useReducedMotion();
   const [showWelcomePrompt, setShowWelcomePrompt] = useState(true);
   const [trackIndex, setTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -192,41 +193,49 @@ export const MusicPlayer: React.FC = () => {
       <AnimatePresence>
         {showWelcomePrompt && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, pointerEvents: 'none', transition: { duration: 0.18 } }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#04060c]/85 sm:backdrop-blur-md"
+            exit={{
+              opacity: 0,
+              pointerEvents: 'none',
+              transition: { duration: prefersReducedMotion ? 0.01 : 0.18 },
+            }}
+            transition={{ duration: prefersReducedMotion ? 0.01 : 0.35, ease: 'easeOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-[#04060c]/85 sm:backdrop-blur-md"
             role="dialog"
             aria-modal="true"
             aria-label="Audio experience prompt"
             onClick={() => setShowWelcomePrompt(false)}
           >
             <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.985 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 20, scale: 0.985 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.985, transition: { duration: 0.16 } }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0, transition: { duration: 0.01 } }
+                  : { opacity: 0, y: 10, scale: 0.985, transition: { duration: 0.16 } }
+              }
+              transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md rounded-none border border-white/[0.12] bg-[#0b101d]/98 shadow-[0_24px_70px_-16px_rgba(0,0,0,0.9)] overflow-hidden"
+              className="relative w-full max-w-md max-h-[90dvh] flex flex-col rounded-none border border-white/[0.12] bg-[#0b101d]/98 shadow-[0_24px_70px_-16px_rgba(0,0,0,0.9)] overflow-hidden"
               style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
             >
               {/* Animated Top Amber Construction Bar */}
               <motion.div
-                initial={{ scaleX: 0 }}
+                initial={prefersReducedMotion ? false : { scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.95, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: prefersReducedMotion ? 0.01 : 0.7, delay: prefersReducedMotion ? 0 : 0.08, ease: [0.22, 1, 0.36, 1] }}
                 style={{ transformOrigin: 'left' }}
-                className="h-[2px] w-full bg-amber-400"
+                className="h-[2px] w-full bg-amber-400 shrink-0"
               />
 
               {/* Prompt Header */}
-              <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-white/[0.07]">
+              <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-white/[0.07] shrink-0">
                 <div className="space-y-2">
                   <motion.div
-                    initial={{ opacity: 0, x: -12 }}
+                    initial={prefersReducedMotion ? false : { opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.65, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: prefersReducedMotion ? 0.01 : 0.45, delay: prefersReducedMotion ? 0 : 0.1, ease: [0.22, 1, 0.36, 1] }}
                     className="inline-flex items-center gap-2 text-[10px] font-editorial-mono font-semibold uppercase tracking-[0.18em] text-amber-400"
                   >
                     <Headphones className="w-3.5 h-3.5" />
@@ -235,9 +244,9 @@ export const MusicPlayer: React.FC = () => {
 
                   <div className="overflow-hidden">
                     <motion.h2
-                      initial={{ y: '100%', opacity: 0 }}
+                      initial={prefersReducedMotion ? false : { y: '100%', opacity: 0 }}
                       animate={{ y: '0%', opacity: 1 }}
-                      transition={{ duration: 0.75, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, delay: prefersReducedMotion ? 0 : 0.14, ease: [0.22, 1, 0.36, 1] }}
                       className="text-xl font-extrabold tracking-tight text-white leading-snug"
                     >
                       I love music — want to listen while you check out my page?
@@ -245,9 +254,9 @@ export const MusicPlayer: React.FC = () => {
                   </div>
 
                   <motion.p
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: prefersReducedMotion ? 0.01 : 0.45, delay: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
                     className="text-xs text-slate-400 leading-relaxed"
                   >
                     I put together a few of my favorite tracks, so I was wondering if you&apos;d like to listen to some while exploring. Pick a song below or hit play — you can control or mute it anytime.
@@ -265,14 +274,18 @@ export const MusicPlayer: React.FC = () => {
               </div>
 
               {/* Quick Track Picker inside Prompt — Staggered Reveal */}
-              <div className="max-h-56 overflow-y-auto divide-y divide-white/[0.05] bg-[#080c16]/70">
+              <div className="min-h-0 flex-1 max-h-56 overflow-y-auto divide-y divide-white/[0.05] bg-[#080c16]/70">
                 {TRACKS.map((t, idx) => (
                   <motion.button
                     key={t.id}
                     type="button"
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={prefersReducedMotion ? false : { opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.55 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{
+                      duration: prefersReducedMotion ? 0.01 : 0.35,
+                      delay: prefersReducedMotion ? 0 : 0.16 + idx * 0.035,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                     onClick={() => handleStartFromPrompt(idx)}
                     className="w-full px-6 py-2.5 flex items-center justify-between gap-3 text-left hover:bg-amber-400/[0.08] transition-colors cursor-pointer group"
                   >
@@ -296,10 +309,10 @@ export const MusicPlayer: React.FC = () => {
 
               {/* Prompt Actions */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
-                className="p-5 border-t border-white/[0.08] bg-[#0b101d] flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+                transition={{ duration: prefersReducedMotion ? 0.01 : 0.35, delay: prefersReducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="p-5 border-t border-white/[0.08] bg-[#0b101d] flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0"
               >
                 <button
                   type="button"
@@ -320,7 +333,7 @@ export const MusicPlayer: React.FC = () => {
               </motion.div>
 
               {/* Copyright & Non-Commercial Audio Notice */}
-              <div className="px-6 py-3 border-t border-white/[0.06] bg-[#070a12] text-[10px] leading-relaxed font-editorial-mono text-slate-500">
+              <div className="px-6 py-3 border-t border-white/[0.06] bg-[#070a12] text-[10px] leading-relaxed font-editorial-mono text-slate-500 shrink-0">
                 All music rights belong to their respective artists &amp; labels. Played strictly for personal, non-commercial enjoyment—no distribution intended. Removal requests:{' '}
                 <a
                   href="mailto:matterr99@outlook.com?subject=Audio%20Removal%20Request"
@@ -337,9 +350,9 @@ export const MusicPlayer: React.FC = () => {
 
       {/* Persistent Floating Squared Music Player Dock */}
       <motion.aside
-        initial={{ opacity: 0, y: 20 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.35, ease: 'easeOut' }}
+        transition={{ duration: prefersReducedMotion ? 0.01 : 0.45, delay: prefersReducedMotion ? 0 : 0.35, ease: 'easeOut' }}
         aria-label="Music Player"
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-[350px] max-w-[370px]"
       >
@@ -347,14 +360,14 @@ export const MusicPlayer: React.FC = () => {
           className="rounded-none border border-white/[0.12] border-t-2 border-t-amber-400 bg-[#0b101d]/95 backdrop-blur-xl shadow-[0_18px_50px_-12px_rgba(0,0,0,0.85)] overflow-hidden"
           style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
         >
-          {/* Expandable 6-Track Playlist & Volume Drawer */}
+          {/* Expandable 8-Track Playlist & Volume Drawer */}
           <AnimatePresence initial={false}>
             {isExpanded && (
               <motion.div
-                initial={{ height: 0, opacity: 0 }}
+                initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
+                exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                transition={{ duration: prefersReducedMotion ? 0.01 : 0.22, ease: 'easeOut' }}
                 className="overflow-hidden border-b border-white/[0.08]"
               >
                 <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between text-[10px] font-editorial-mono uppercase tracking-[0.16em] text-slate-400">

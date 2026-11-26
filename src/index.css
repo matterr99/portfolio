@@ -86,3 +86,10 @@
   transform-origin: bottom;
   animation: eq-bar 0.75s ease-in-out infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-eq-bar,
+  .animate-ticker {
+    animation: none;
+  }
+}

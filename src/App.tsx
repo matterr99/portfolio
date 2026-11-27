@@ -57,11 +57,24 @@ export default function App() {
     }
   });
   const [copied, setCopied] = useState(false);
+  const [pageReady, setPageReady] = useState(false);
+  const [introFinished, setIntroFinished] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : true
   );
   const prefersReducedMotion = useReducedMotion();
+  const ready = pageReady || Boolean(prefersReducedMotion);
   const t = COPY[lang];
+
+  useEffect(() => {
+    if (!ready) return;
+    if (prefersReducedMotion) {
+      setIntroFinished(true);
+      return;
+    }
+    const timer = window.setTimeout(() => setIntroFinished(true), 950);
+    return () => window.clearTimeout(timer);
+  }, [ready, prefersReducedMotion]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -90,12 +103,12 @@ export default function App() {
 
   return (
     <div className="relative min-h-[100dvh] bg-[#070a12] text-slate-100 font-editorial-sans selection:bg-amber-400 selection:text-slate-950 flex flex-col justify-between overflow-x-clip">
-      {/* Top Architectural Progress Sweep on Initial Load */}
-      {!prefersReducedMotion && (
+      {/* Top Architectural Progress Sweep — fires once modal is dismissed */}
+      {ready && !prefersReducedMotion && (
         <motion.div
           initial={{ scaleX: 0, opacity: 1 }}
           animate={{ scaleX: 1, opacity: [1, 1, 0] }}
-          transition={{ duration: 1.85, times: [0, 0.8, 1], ease: BUILD_EASE }}
+          transition={{ duration: 1.5, times: [0, 0.8, 1], ease: BUILD_EASE }}
           style={{ transformOrigin: 'left' }}
           className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 z-50 pointer-events-none"
           aria-hidden="true"
@@ -105,8 +118,8 @@ export default function App() {
       {/* Subtle Ambient Background Lighting & Architectural Grid (Zero-Blur Radial Gradients for 60fps Mobile Scroll) */}
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.4, ease: 'easeOut' }}
+        animate={ready ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1.0, ease: 'easeOut' }}
         className="pointer-events-none fixed inset-0 overflow-hidden"
         aria-hidden="true"
       >
@@ -129,11 +142,11 @@ export default function App() {
         />
       </motion.div>
 
-      {/* Header — Builds in first */}
+      {/* Header — Step 1 */}
       <motion.header
         initial={prefersReducedMotion ? false : { opacity: 0, y: -14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.1, ease: BUILD_EASE }}
+        animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: -14 }}
+        transition={{ duration: 0.55, delay: 0.05, ease: BUILD_EASE }}
         className="sticky top-0 z-30 bg-[#070a12]/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -182,11 +195,11 @@ export default function App() {
             </a>
           </div>
         </div>
-        {/* Animated Header Bottom Rule */}
+        {/* Animated Header Bottom Rule — Step 2 */}
         <motion.div
           initial={prefersReducedMotion ? false : { scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.05, delay: 0.25, ease: BUILD_EASE }}
+          animate={ready ? { scaleX: 1 } : { scaleX: 0 }}
+          transition={{ duration: 0.65, delay: 0.16, ease: BUILD_EASE }}
           style={{ transformOrigin: 'left' }}
           className="h-px w-full bg-white/[0.08]"
         />
@@ -194,14 +207,14 @@ export default function App() {
 
       {/* Main Content */}
       <main className="relative z-10 max-w-6xl w-full mx-auto px-5 sm:px-8 py-10 sm:py-16 space-y-12 sm:space-y-16 flex-1">
-        {/* Hero Header — Masked typographic construction */}
+        {/* Hero Header — Steps 3–7, strictly top-to-bottom */}
         <section className="pb-8 sm:pb-10 relative">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-3.5 max-w-2xl">
               <motion.div
                 initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3, ease: BUILD_EASE }}
+                animate={ready ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
+                transition={{ duration: 0.5, delay: 0.22, ease: BUILD_EASE }}
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-amber-400/[0.07] border border-amber-400/20 border-l-2 border-l-amber-400"
               >
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -213,8 +226,8 @@ export default function App() {
               <div className="overflow-hidden">
                 <motion.h1
                   initial={prefersReducedMotion ? false : { y: '100%', opacity: 0 }}
-                  animate={{ y: '0%', opacity: 1 }}
-                  transition={{ duration: 0.95, delay: 0.45, ease: BUILD_EASE }}
+                  animate={ready ? { y: '0%', opacity: 1 } : { y: '100%', opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3, ease: BUILD_EASE }}
                   className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.08] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
                 >
                   {t.hero.title}
@@ -223,8 +236,8 @@ export default function App() {
 
               <motion.p
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.85, delay: 0.65, ease: BUILD_EASE }}
+                animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                transition={{ duration: 0.5, delay: 0.4, ease: BUILD_EASE }}
                 className="text-sm sm:text-base text-slate-400 leading-relaxed"
               >
                 {t.hero.description}
@@ -233,8 +246,8 @@ export default function App() {
 
             <motion.div
               initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.78, ease: BUILD_EASE }}
+              animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+              transition={{ duration: 0.45, delay: 0.48, ease: BUILD_EASE }}
               className="flex items-center gap-4 text-[11px] font-editorial-mono text-slate-500 uppercase tracking-wider shrink-0"
             >
               <span>{t.hero.disciplines}</span>
@@ -243,38 +256,48 @@ export default function App() {
             </motion.div>
           </div>
 
-          {/* Hero Bottom Divider Sweeps Across */}
+          {/* Hero Bottom Divider Sweeps Across — after Hero content */}
           <motion.div
             initial={prefersReducedMotion ? false : { scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.15, delay: 0.65, ease: BUILD_EASE }}
+            animate={ready ? { scaleX: 1 } : { scaleX: 0 }}
+            transition={{ duration: 0.7, delay: 0.54, ease: BUILD_EASE }}
             style={{ transformOrigin: 'left' }}
             className="absolute bottom-0 left-0 right-0 h-px bg-white/[0.09]"
           />
         </section>
 
-        {/* Project Grid — Cards unfold & assemble as you scroll */}
+        {/* Project Grid — Step 8: cascades after Hero on initial view, instant on later scroll */}
         <section aria-label={t.projectsSectionAria}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
             {PROJECTS.map((project, idx) => {
-              const cardDelay = isDesktop ? idx * 0.14 : 0;
+              const cardDelay = introFinished ? 0 : 0.62 + (isDesktop ? idx * 0.12 : 0);
               const copy = t.projects[project.id];
               return (
                 <motion.article
                   key={project.id}
-                  initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={prefersReducedMotion ? 'visible' : 'hidden'}
+                  whileInView={ready ? 'visible' : undefined}
                   viewport={{ once: true, amount: 'some' }}
-                  transition={{ duration: 0.9, delay: cardDelay, ease: BUILD_EASE }}
+                  variants={{
+                    hidden: { opacity: 0, y: 24 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.65, delay: cardDelay, ease: BUILD_EASE },
+                    },
+                  }}
                   className={`group relative rounded-none overflow-hidden bg-gradient-to-b from-[#111829]/90 to-[#0c111e]/95 border border-white/[0.09] transition-[border-color,box-shadow,translate] duration-300 flex flex-col justify-between shadow-[0_12px_40px_-16px_rgba(0,0,0,0.75)] hover:-translate-y-1 hover:shadow-2xl ${project.accentGlow}`}
                   style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
                 >
-                  {/* Top Bar Sweeps Left-to-Right on Scroll */}
+                  {/* Top Bar Sweeps Left-to-Right — synced to card */}
                   <motion.div
-                    initial={prefersReducedMotion ? false : { scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true, amount: 'some' }}
-                    transition={{ duration: 0.9, delay: cardDelay + 0.15, ease: BUILD_EASE }}
+                    variants={{
+                      hidden: { scaleX: 0 },
+                      visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.6, delay: cardDelay + 0.08, ease: BUILD_EASE },
+                      },
+                    }}
                     style={{ transformOrigin: 'left' }}
                     className={`h-[2px] w-full bg-white/[0.1] transition-colors duration-300 ${project.topBar}`}
                   />
@@ -289,10 +312,14 @@ export default function App() {
                       aria-label={copy.openAria}
                     >
                       <motion.div
-                        initial={prefersReducedMotion ? false : { scale: 1.06, opacity: 0.4 }}
-                        whileInView={{ scale: 1, opacity: 1 }}
-                        viewport={{ once: true, amount: 'some' }}
-                        transition={{ duration: 1.15, delay: cardDelay + 0.1, ease: BUILD_EASE }}
+                        variants={{
+                          hidden: { scale: 1.06, opacity: 0.4 },
+                          visible: {
+                            scale: 1,
+                            opacity: 1,
+                            transition: { duration: 0.75, delay: cardDelay + 0.15, ease: BUILD_EASE },
+                          },
+                        }}
                         className="w-full h-full"
                       >
                         <img
@@ -383,19 +410,25 @@ export default function App() {
 
         {/* Connect Banner — Constructs on scroll */}
         <motion.section
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={prefersReducedMotion ? 'visible' : 'hidden'}
+          whileInView={ready ? 'visible' : undefined}
           viewport={{ once: true, amount: 'some' }}
-          transition={{ duration: 0.95, ease: BUILD_EASE }}
+          variants={{
+            hidden: { opacity: 0, y: 24 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: BUILD_EASE } },
+          }}
           className="relative overflow-hidden p-8 sm:p-12 rounded-none border border-white/[0.09] bg-gradient-to-br from-[#121a2e]/90 via-[#0d1322]/95 to-[#0a0f1c] text-center space-y-4 shadow-2xl"
           style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)' }}
         >
-          {/* Animated Top Amber Rule on Scroll */}
+          {/* Animated Top Amber Rule on Scroll — synced to banner */}
           <motion.div
-            initial={prefersReducedMotion ? false : { scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, amount: 'some' }}
-            transition={{ duration: 1.05, delay: 0.15, ease: BUILD_EASE }}
+            variants={{
+              hidden: { scaleX: 0 },
+              visible: {
+                scaleX: 1,
+                transition: { duration: 0.75, delay: 0.12, ease: BUILD_EASE },
+              },
+            }}
             style={{ transformOrigin: 'left' }}
             className="absolute top-0 left-0 right-0 h-[2px] bg-amber-400/70"
             aria-hidden="true"
@@ -454,9 +487,9 @@ export default function App() {
       {/* Footer — Reveals on scroll, extra bottom padding so the fixed MusicPlayer never overlaps */}
       <motion.footer
         initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        whileInView={ready ? { opacity: 1, y: 0 } : undefined}
         viewport={{ once: true, amount: 'some' }}
-        transition={{ duration: 0.85, ease: BUILD_EASE }}
+        transition={{ duration: 0.65, ease: BUILD_EASE }}
         className="relative z-10 border-t border-white/[0.07] bg-[#05080f]/90 pt-6 pb-28 sm:pb-24 px-5 sm:px-8"
       >
         <div className="max-w-6xl mx-auto space-y-3">
@@ -484,7 +517,12 @@ export default function App() {
       </motion.footer>
 
       {/* Floating 8-Track Ambient Music Player */}
-      <MusicPlayer lang={lang} onToggleLang={toggleLang} />
+      <MusicPlayer
+        lang={lang}
+        onToggleLang={toggleLang}
+        pageReady={ready}
+        onPromptDismiss={() => setPageReady(true)}
+      />
     </div>
   );
 }
